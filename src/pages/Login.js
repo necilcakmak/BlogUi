@@ -8,7 +8,7 @@ import { useAuth } from "../context";
 
 const Login = () => {
   const navigate = useNavigate();
-  const {setIsLoggedIn} = useAuth();
+  const { setIsLoggedIn, setUser } = useAuth();
   const [errors, setErrors] = useState({});
   const [pendingApiCall, setPendingApiCall] = useState(false);
   const [form, setForm] = useState({
@@ -39,8 +39,10 @@ const Login = () => {
     setPendingApiCall(false);
     if (response.success === true) {
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
       alertify.success(response.message);
       setIsLoggedIn(true);
+      setUser(response.data.user);
       navigate("/");
     } else {
       if (response.validationErrors !== null) {
