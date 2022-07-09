@@ -1,7 +1,13 @@
 import React, { Fragment } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../context";
 
 const Navbar = () => {
+  const { isLoggedIn, setIsLoggedIn } = useAuth();
+  const logout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+  };
   const questLinks = () => (
     <Fragment>
       <li className="nav-item">
@@ -14,13 +20,13 @@ const Navbar = () => {
   const authLinks = () => (
     <Fragment>
       <li className="nav-item">
-        <Link className="nav-link" to="/login">
-          Login
-        </Link>
-      </li>
-      <li className="nav-item">
-        <Link className="nav-link" style={{ cursor: "pointer" }} to="/">
-          Çıkış
+        <Link
+          className="nav-link"
+          style={{ cursor: "pointer" }}
+          to="/"
+          onClick={logout}
+        >
+          Logout
         </Link>
       </li>
     </Fragment>
@@ -44,7 +50,9 @@ const Navbar = () => {
             <span className="navbar-toggler-icon"></span>
           </button>
           <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav">{authLinks()}</ul>
+            <ul className="navbar-nav">
+              {isLoggedIn ? authLinks() : questLinks()}
+            </ul>
           </div>
         </div>
       </nav>

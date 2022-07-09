@@ -3,9 +3,12 @@ import alertify from "alertifyjs";
 import Input from "../components/Input";
 import { post } from "../api/globalServices";
 import { useNavigate } from "react-router-dom";
+import * as Constant from "../Constant";
+import { useAuth } from "../context";
 
 const Login = () => {
   const navigate = useNavigate();
+  const {setIsLoggedIn} = useAuth();
   const [errors, setErrors] = useState({});
   const [pendingApiCall, setPendingApiCall] = useState(false);
   const [form, setForm] = useState({
@@ -32,11 +35,12 @@ const Login = () => {
       Password,
     };
     setPendingApiCall(true);
-    const response = await post("auth/login", cred);
+    const response = await post(Constant.LOGIN_URL, cred);
     setPendingApiCall(false);
     if (response.success === true) {
       localStorage.setItem("token", response.data.token);
       alertify.success(response.message);
+      setIsLoggedIn(true);
       navigate("/");
     } else {
       if (response.validationErrors !== null) {
