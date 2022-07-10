@@ -2,12 +2,13 @@ import alertify from "alertifyjs";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { get } from "../api/globalServices";
+import EndPoints from "../EndPoints";
 
 const Articles = () => {
   const [articles, setArticles] = useState([]);
   useEffect(() => {
     const articles = async () => {
-      const response = await get("article/getlist");
+      const response = await get(EndPoints.GET_ARTICLES);
       if (response.success) {
         setArticles(response.data);
       } else {

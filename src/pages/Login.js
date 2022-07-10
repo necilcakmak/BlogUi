@@ -3,10 +3,12 @@ import alertify from "alertifyjs";
 import Input from "../components/Input";
 import { post } from "../api/globalServices";
 import { useNavigate } from "react-router-dom";
-import * as Constant from "../Constant";
 import { useAuth } from "../context";
+import EndPoints from "../EndPoints";
+import { useTranslation } from "react-i18next";
 
 const Login = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { setIsLoggedIn, setUser } = useAuth();
   const [errors, setErrors] = useState({});
@@ -35,7 +37,7 @@ const Login = () => {
       Password,
     };
     setPendingApiCall(true);
-    const response = await post(Constant.LOGIN_URL, cred);
+    const response = await post(EndPoints.LOGIN_URL, cred);
     setPendingApiCall(false);
     if (response.success === true) {
       localStorage.setItem("token", response.data.token);
@@ -55,11 +57,11 @@ const Login = () => {
     <div className="container mt-5">
       <div className="row justify-content-md-center">
         <div className="col-sm-5">
-          <h3 className="text-center">Login</h3>
+          <h3 className="text-center">{t('LoginPage')}</h3>
           <form onSubmit={(e) => onSubmit(e)}>
             <Input
               type="text"
-              placeholder="E-Mail"
+              placeholder={t('Email')}
               name="Email"
               error={errors.Email}
               value={Email}
@@ -67,7 +69,7 @@ const Login = () => {
             />
             <Input
               type="password"
-              placeholder="Password"
+              placeholder={t('Password')}
               name="Password"
               error={errors.Password}
               value={Password}
@@ -85,7 +87,7 @@ const Login = () => {
               {pendingApiCall && (
                 <span className="spinner-border spinner-border-sm"></span>
               )}
-              Login
+              {t('Login')}
             </button>
           </form>
         </div>

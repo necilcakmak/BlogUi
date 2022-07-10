@@ -1,10 +1,15 @@
 import React, { Fragment, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context";
+import { useTranslation } from "react-i18next";
 
 const Navbar = () => {
+  const { t, i18n } = useTranslation();
   const { isLoggedIn, setIsLoggedIn, user, setUser } = useAuth();
 
+  const onChangeLang = (lang) => {
+    i18n.changeLanguage(lang);
+  };
   useEffect(() => {
     setUser(JSON.parse(localStorage.getItem("user")));
     setIsLoggedIn(localStorage.getItem("token"));
@@ -21,7 +26,7 @@ const Navbar = () => {
     <Fragment>
       <li className="nav-item">
         <Link className="nav-link" to="/login">
-          Login
+          {t("Login")}
         </Link>
       </li>
     </Fragment>
@@ -35,7 +40,7 @@ const Navbar = () => {
           to="/"
           onClick={logout}
         >
-          Logout
+          {t("Logout")}
         </Link>
       </li>
     </Fragment>
@@ -45,7 +50,7 @@ const Navbar = () => {
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <div className="container-fluid">
           <Link className="navbar-brand" to="/">
-            Home
+            {t("Home")}
           </Link>
 
           <button
@@ -63,11 +68,29 @@ const Navbar = () => {
             <ul className="navbar-nav">
               <li className="nav-item">
                 <Link className="nav-link" to="/articles">
-                  Articles
+                  {t("Articles")}
                 </Link>
               </li>
 
               {isLoggedIn ? authLinks() : questLinks()}
+              <li className="nav-item">
+                <span
+                  className="nav-link"
+                  onClick={() => onChangeLang("tr")}
+                  style={{ cursor: "pointer" }}
+                >
+                  tr
+                </span>
+              </li>
+              <li className="nav-item">
+                <span
+                  className="nav-link"
+                  onClick={() => onChangeLang("en")}
+                  style={{ cursor: "pointer" }}
+                >
+                  en
+                </span>
+              </li>
             </ul>
           </div>
           <form className="form-inline">
