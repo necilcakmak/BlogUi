@@ -26,6 +26,7 @@ axiosInstance.interceptors.response.use(
     if (err.response.data?.success === false) {
       return err.response.data;
     }
+
     alertify.err(err.message);
     return Promise.reject(err);
   }

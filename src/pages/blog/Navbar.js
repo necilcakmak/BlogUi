@@ -5,13 +5,13 @@ import { useTranslation } from "react-i18next";
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
-  const { isLoggedIn, setIsLoggedIn, user, setUser } = useAuth();
+  const { isLoggedIn, setIsLoggedIn, setUser } = useAuth();
 
   const onChangeLang = (lang) => {
     i18n.changeLanguage(lang);
   };
   useEffect(() => {
-    setUser(JSON.parse(localStorage.getItem("user")));
+    setUser(localStorage.getItem("user"));
     setIsLoggedIn(localStorage.getItem("token"));
   });
 
@@ -34,6 +34,11 @@ const Navbar = () => {
   const authLinks = () => (
     <Fragment>
       <li className="nav-item">
+        <Link className="nav-link" to="/login">
+          {t("Login")}
+        </Link>
+      </li>
+      <li className="nav-item">
         <Link
           className="nav-link"
           style={{ cursor: "pointer" }}
@@ -41,6 +46,16 @@ const Navbar = () => {
           onClick={logout}
         >
           {t("Logout")}
+        </Link>
+      </li>
+      <li className="nav-item">
+        <Link className="nav-link" to="/profile">
+          Profile
+        </Link>
+      </li>
+      <li className="nav-item">
+        <Link className="nav-link" to="/admin">
+          Admin
         </Link>
       </li>
     </Fragment>
@@ -73,29 +88,26 @@ const Navbar = () => {
               </li>
 
               {isLoggedIn ? authLinks() : questLinks()}
-              <li className="nav-item">
-                <span
-                  className="nav-link"
-                  onClick={() => onChangeLang("tr")}
-                  style={{ cursor: "pointer" }}
-                >
-                  tr
-                </span>
-              </li>
-              <li className="nav-item">
-                <span
-                  className="nav-link"
-                  onClick={() => onChangeLang("en")}
-                  style={{ cursor: "pointer" }}
-                >
-                  en
-                </span>
-              </li>
             </ul>
           </div>
-          <form className="form-inline">
-            <span>{user?.userName}</span>
-          </form>
+          <ul className="navbar-nav">
+            <li className="nav-item">
+              <img
+                src="https://countryflagsapi.com/png/tr"
+                alt="Turkey flag"
+                onClick={() => onChangeLang("tr")}
+                style={{ cursor: "pointer", width: 24, height: 24 }}
+              />
+            </li>
+            <li className="nav-item">
+              <img
+                src="https://countryflagsapi.com/png/gb"
+                alt="English"
+                onClick={() => onChangeLang("en")}
+                style={{ cursor: "pointer", width: 24, height: 24 }}
+              />
+            </li>
+          </ul>
         </div>
       </nav>
     </div>

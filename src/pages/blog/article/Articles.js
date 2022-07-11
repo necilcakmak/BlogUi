@@ -1,8 +1,8 @@
 import alertify from "alertifyjs";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { get } from "../api/globalServices";
-import EndPoints from "../EndPoints";
+import { get } from "../../../api/globalServices";
+import EndPoints from "../../../EndPoints";
 
 const Articles = () => {
   const [articles, setArticles] = useState([]);

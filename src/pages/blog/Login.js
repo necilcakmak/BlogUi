@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import alertify from "alertifyjs";
-import Input from "../components/Input";
-import { post } from "../api/globalServices";
+import Input from "../../components/Input";
+import { post } from "../../api/globalServices";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context";
-import EndPoints from "../EndPoints";
+import { useAuth } from "../../context";
+import EndPoints from "../../EndPoints";
 import { useTranslation } from "react-i18next";
 
 const Login = () => {
@@ -43,8 +43,12 @@ const Login = () => {
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
       alertify.success(response.message);
+
       setIsLoggedIn(true);
       setUser(response.data.user);
+      if (response.data.user.roleName === "admin") {
+        navigate("/admin");
+      }
       navigate("/");
     } else {
       if (response.validationErrors !== null) {
@@ -57,11 +61,11 @@ const Login = () => {
     <div className="container mt-5">
       <div className="row justify-content-md-center">
         <div className="col-sm-5">
-          <h3 className="text-center">{t('LoginPage')}</h3>
+          <h3 className="text-center">{t("LoginPage")}</h3>
           <form onSubmit={(e) => onSubmit(e)}>
             <Input
               type="text"
-              placeholder={t('Email')}
+              placeholder={t("Email")}
               name="Email"
               error={errors.Email}
               value={Email}
@@ -69,7 +73,7 @@ const Login = () => {
             />
             <Input
               type="password"
-              placeholder={t('Password')}
+              placeholder={t("Password")}
               name="Password"
               error={errors.Password}
               value={Password}
@@ -87,7 +91,7 @@ const Login = () => {
               {pendingApiCall && (
                 <span className="spinner-border spinner-border-sm"></span>
               )}
-              {t('Login')}
+              {t("Login")}
             </button>
           </form>
         </div>

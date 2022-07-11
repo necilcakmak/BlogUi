@@ -9,9 +9,13 @@ i18n.use(initReactI18next).init({
         Email: "E-Mail",
         Password: "Password",
         Login: "Login",
-        Home:"Home",
-        Articles:"Articles",
-        Logout:"Logout"
+        Home: "Home",
+        Articles: "Articles",
+        Logout: "Logout",
+        Add: "Add",
+        Admin: "Admin",
+        User: "User",
+        Users: "Users",
       },
     },
     tr: {
@@ -20,9 +24,13 @@ i18n.use(initReactI18next).init({
         Email: "E-Posta",
         Password: "Parola",
         Login: "Giriş",
-        Home:"AnaSayfa",
-        Articles:"Makaleler",
-        Logout:"Çıkış"
+        Home: "AnaSayfa",
+        Articles: "Makaleler",
+        Logout: "Çıkış",
+        Add: "Ekle",
+        Admin: "Yönetici",
+        User: "Kullanıcı",
+        Users: "Kullanıcılar",
       },
     },
   },
@@ -35,7 +43,7 @@ i18n.use(initReactI18next).init({
     formatSeparator: ",",
   },
   react: {
-    wait: true,
+    useSuspense: true,
   },
 });
 export default i18n;
