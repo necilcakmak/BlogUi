@@ -17,10 +17,9 @@ const Users = () => {
   }, []);
   return (
     <div>
-      <h5 className="float-left p-2">Users List</h5>
+      <h5 className="users">Users List</h5>
 
       {users?.map((a) => (
-        
         <h3 key={a.id}>{a.userName}</h3>
       ))}
     </div>

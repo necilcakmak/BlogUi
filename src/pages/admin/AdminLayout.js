@@ -1,13 +1,16 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import AdminNav from "./AdminNav";
-
+import Sidebar from "./Sidebar";
 const AdminLayout = () => {
   return (
-    <div className="container">
-      <AdminNav />
-      <Outlet />
-    </div>
+    <>
+      <div id="wrapper">
+        <Sidebar />
+        <div id="content">
+          <Outlet />
+        </div>
+      </div>
+    </>
   );
 };
 
