@@ -4,6 +4,7 @@ import App from "./App";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "alertifyjs/build/css/alertify.min.css";
 import "./i18n";
+
 import AuthProvider from "./context";
 import { BrowserRouter } from "react-router-dom";
 
