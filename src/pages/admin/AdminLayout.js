@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import classNames from "classnames";
 import { Outlet } from "react-router-dom";
-
 import PrimeReact from "primereact/api";
 import { Tooltip } from "primereact/tooltip";
 import Topbar from "./Topbar";
@@ -18,7 +17,6 @@ const AdminLayout = () => {
   const [mobileMenuActive, setMobileMenuActive] = useState(false);
   const [mobileTopbarMenuActive, setMobileTopbarMenuActive] = useState(false);
   const copyTooltipRef = useRef();
-
   PrimeReact.ripple = true;
 
   const menu = [
@@ -41,7 +39,6 @@ const AdminLayout = () => {
           icon: "pi pi-fw pi-id-card",
           to: "/admin/users",
         },
-       
       ],
     },
   ];

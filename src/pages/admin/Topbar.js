@@ -14,7 +14,7 @@ const Topbar = (props) => {
           }
           alt="logo"
         />
-        <span>SAKAI</span>
+        <span>Blog</span>
       </Link>
 
       <button

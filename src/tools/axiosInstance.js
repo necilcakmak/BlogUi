@@ -8,10 +8,10 @@ export const axiosInstance = axios.create({
   },
 });
 //#region request interceptor
-axiosInstance.interceptors.request.use((request) => {
+axiosInstance.interceptors.request.use(async (request) => {
   const isApiUrl = request.baseURL.startsWith(process.env.REACT_APP_API_URL);
   if (isApiUrl) {
-    request.headers.common.Authorization = `${localStorage.getItem("token")}`;
+    request.headers.Authorization = `${localStorage.getItem("token")}`;
   }
   return request;
 });
