@@ -1,68 +1,16 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
+import Backend from "i18next-http-backend";
+import LanguageDetector from "i18next-browser-languagedetector";
 
-let userLang = navigator.language || navigator.userLanguage;
-userLang = userLang.split("-")[0];
-
-i18n.use(initReactI18next).init({
-  resources: {
-    en: {
-      translations: {
-        Common: {
-          add: "Add",
-          delete: "Delete",
-          update: "Update",
-          detail: "Detail",
-        },
-        LoginPage: "Login Page",
-        Email: "E-Mail",
-        Password: "Password",
-        Login: "Login",
-        Home: "Home",
-        Articles: "Articles",
-        Logout: "Logout",
-        Add: "Add",
-        Admin: "Admin",
-        User: "User",
-        Users: "Users",
-        Profile: "Profile",
-        Admin: "Admin",
-      },
-    },
-    tr: {
-      translations: {
-        Common: {
-          add: "Ekle",
-          delete: "Sil",
-          update: "Güncelle",
-          detail: "Detay",
-        },
-        LoginPage: "Giriş Sayfası",
-        Email: "E-Posta",
-        Password: "Parola",
-        Login: "Giriş",
-        Home: "AnaSayfa",
-        Articles: "Makaleler",
-        Logout: "Çıkış",
-        Add: "Ekle",
-        Admin: "Yönetici",
-        User: "Kullanıcı",
-        Users: "Kullanıcılar",
-        Profile: "Profil",
-        Admin: "Yönetici",
-      },
-    },
-  },
-  fallbackLng: { userLang },
-  ns: ["translations"],
-  defaultNS: "translations",
-  keySeparator: false,
-  interpolation: {
-    escapeValue: false,
-    formatSeparator: ",",
-  },
-  react: {
-    useSuspense: true,
-  },
-});
+i18n
+  .use(initReactI18next)
+  .use(Backend)
+  .use(LanguageDetector)
+  .init({
+    fallbackLng: "en",//browsera gore dil dosyalarımı bulamazsa(tr,en) default en calissin.
+    // backend: { // api den de cekebilirim kenarda dursun simdilik.
+    //   loadPath: process.env.REACT_APP_API_URL+"user?lang={{lng}}",
+    // },
+  });
 export default i18n;

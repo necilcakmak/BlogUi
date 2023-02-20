@@ -1,0 +1,21 @@
+{
+  "Common": {
+    "add": "Add",
+    "delete": "Delete",
+    "update": "Update",
+    "detail": "Detail"
+  },
+  "LoginPage": "Login Page",
+  "Email": "E-Mail",
+  "Password": "Password",
+  "Login": "Login",
+  "Home": "Home",
+  "Articles": "Articles",
+  "Logout": "Logout",
+  "Add": "Add",
+  "Admin": "Admin",
+  "User": "User",
+  "Users": "Users",
+  "Profile": "Profile",
+  "Admin": "Admin"
+}
