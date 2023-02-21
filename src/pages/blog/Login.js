@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import alertify from "alertifyjs";
+import { toast } from "react-toastify";
 import Input from "../../components/Input";
 import { post } from "../../api/globalServices";
 import { useNavigate } from "react-router-dom";
@@ -42,7 +42,7 @@ const Login = () => {
     if (response.success === true) {
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
-      alertify.success(response.message);
+      toast.success(response.message);
 
       setIsLoggedIn(true);
       setUser(response.data.user);
@@ -54,7 +54,7 @@ const Login = () => {
       if (response.validationErrors !== null) {
         setErrors(response.validationErrors);
       }
-      alertify.error(response.message);
+      toast.error(response.message);
     }
   };
   return (

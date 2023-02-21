@@ -10,7 +10,7 @@ i18n
   .init({
     fallbackLng: "en",//browsera gore dil dosyalarımı bulamazsa(tr,en) default en calissin.
     // backend: { // api den de cekebilirim kenarda dursun simdilik.
-    //   loadPath: process.env.REACT_APP_API_URL+"user?lang={{lng}}",
+    //   loadPath: process.env.REACT_APP_API_URL+"lang?lang={{lng}}",
     // },
   });
 export default i18n;

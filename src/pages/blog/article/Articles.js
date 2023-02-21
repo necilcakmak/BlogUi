@@ -1,13 +1,13 @@
-import alertify from "alertifyjs";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { get } from "../../../api/globalServices";
 import EndPoints from "../../../EndPoints";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 const Articles = () => {
   const [articles, setArticles] = useState([]);
-  const { t} = useTranslation();
+  const { t } = useTranslation();
   const Common = t("Common", { returnObjects: true });
 
   useEffect(() => {
@@ -16,7 +16,7 @@ const Articles = () => {
       if (response.success) {
         setArticles(response.data);
       } else {
-        alertify.error(response.message);
+        toast.error(response.message);
       }
     };
     articles();
@@ -32,8 +32,12 @@ const Articles = () => {
             <p className="card-text">{a.content}</p>
           </div>
           <ul className="list-group list-group-flush">
-            <li className="list-group-item">Author:{a.user.userName}</li>
-            <li className="list-group-item">Category:{a.category.name}</li>
+            <li className="list-group-item">
+              {t("Author")}:{a.user.userName}
+            </li>
+            <li className="list-group-item">
+              {t("Category")}:{a.category.name}
+            </li>
           </ul>
           <div className="card-body">
             <Link className="btn btn-success" to={"/article/" + a.id}>
