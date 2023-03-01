@@ -1,11 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
+import { get } from "../../../api/globalServices";
+import EndPoints from "../../../EndPoints";
+import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
+import { useParams } from "react-router-dom";
 
 const ArticleDetail = () => {
-    return (
-        <div>
-            
+  let { id } = useParams();
+
+  const [article, setArticle] = useState({});
+  const { t } = useTranslation();
+  useEffect(() => {
+    const article = async () => {
+      const response = await get(EndPoints.GET_ARTICLE + id);
+      if (response.success) {
+        setArticle(response.data);
+      } else {
+        toast.error(response.message);
+      }
+    };
+    article();
+  }, []);
+
+  return (
+    <div className="container p-3">
+      <div className="card" key={article.id}>
+        <div className="card-body">
+          <h5 className="card-title">{article.title}</h5>
+          <p className="card-text">{article.content}</p>
         </div>
-    );
+        <ul className="list-group list-group-flush">
+          <li className="list-group-item">
+            {t("Author")}:{article.user?.userName}
+          </li>
+          <li className="list-group-item">
+            {t("Category")}:{article.category?.name}
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
 };
 
 export default ArticleDetail;

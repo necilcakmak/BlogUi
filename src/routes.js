@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminHome from "./pages/admin/AdminHome";
 import Users from "./pages/admin/Users";
+import ArticleDetail from "./pages/blog/article/ArticleDetail";
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
         path: "articles",
         name: "articles",
         element: <Articles />,
+      },
+      {
+        path: "article/:id",
+        name: "articleDetail",
+        element: <ArticleDetail />,
       },
       {
         path: "profile",
@@ -43,9 +49,9 @@ const routes = [
   {
     path: "/admin",
     element: (
-
+      <PrivateRoute>
         <AdminLayout />
-   
+      </PrivateRoute>
     ),
     children: [
       {

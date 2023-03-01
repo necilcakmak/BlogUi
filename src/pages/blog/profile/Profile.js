@@ -1,17 +1,19 @@
 import React from "react";
 import Input from "../../../components/Input";
 import { useState, useEffect } from "react";
-import { post, update, get } from "../../../api/globalServices";
-import defuser from "../../../assets/defuser.jpg";
+import { update, get } from "../../../api/globalServices";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
+import SelectInput from "../../../components/SelectInput";
+import endPoints from "../../../EndPoints";
 
 const Profile = () => {
   const { t } = useTranslation();
-  const [image, setImage] = useState("");
+  const [profileInfo, setProfileInfo] = useState({});
+  const [isPasswordChange, setIsPasswordChange] = useState(false);
   const [errors, setErrors] = useState({});
   const [pendingApiCall, setPendingApiCall] = useState(false);
-  const [form, setForm] = useState({
+  const initialValues = {
     FirstName: "",
     LastName: "",
     Gender: false,
@@ -19,23 +21,26 @@ const Profile = () => {
     OldPassword: "",
     Password: "",
     PasswordRepeat: "",
-    IsActive: false,
-  });
-  const [profileInfo, setProfileInfo] = useState({});
+    ImageFile: null,
+  };
+  const [form, setForm] = useState(initialValues);
 
   const {
     FirstName,
     LastName,
     Gender,
-    PasswordIsChange,
     OldPassword,
     Password,
     PasswordRepeat,
-    IsActive,
+    IsApproved,
   } = form;
+  const genders = [
+    { name: "Man", val: true },
+    { name: "Woman", val: false },
+  ];
   useEffect(() => {
     const profile = async () => {
-      const response = await get("user/getmyinformation");
+      const response = await get(endPoints.GET_MYINFORMATİON);
       if (response.success) {
         setProfileInfo(response.data);
       } else {
@@ -43,10 +48,36 @@ const Profile = () => {
       }
     };
     profile();
-  },[]);
-  const onChangeImage = (e) => {
-    const { files } = e.target;
-    setImage(files[0]);
+  }, []);
+  const onChangePassword = (e) => {
+    const { name } = e.target;
+    setIsPasswordChange(!isPasswordChange);
+    if (isPasswordChange) {
+      setErrors((previousError) => ({
+        ...previousError,
+        Password: undefined,
+        PasswordRepeat: undefined,
+      }));
+    }
+
+    setForm((previousForm) => ({
+      ...previousForm,
+      [name]: !isPasswordChange,
+    }));
+  };
+  const showPreview = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      let ImageFile = e.target.files[0];
+      const objectUrl = URL.createObjectURL(ImageFile);
+      setForm((previousForm) => ({
+        ...previousForm,
+        ImageFile,
+      }));
+      setProfileInfo((previousForm) => ({
+        ...previousForm,
+        imageSrc: objectUrl,
+      }));
+    }
   };
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -59,21 +90,19 @@ const Profile = () => {
       [name]: value,
     }));
   };
-  const onImageSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append("image", image);
-    const response = await post("user/updateuserimage", formData);
-    setPendingApiCall(false);
-    if (response.success === true) {
-      toast.success(response.message);
-    } else {
-      toast.error(response.message);
-    }
-  };
   const onSubmit = async (e) => {
     e.preventDefault();
-    const response = await update("user/UpdateMyInformation", form);
+    const formData = new FormData();
+    formData.append("FirstName", form.FirstName);
+    formData.append("LastName", form.LastName);
+    formData.append("Gender", form.Gender);
+    formData.append("PasswordIsChange", form.PasswordIsChange);
+    formData.append("OldPassword", form.OldPassword);
+    formData.append("Password", form.Password);
+    formData.append("PasswordRepeat", form.PasswordRepeat);
+    formData.append("ImageFile", form.ImageFile);
+    formData.append("ImageName", profileInfo.imageName);
+    const response = await update(endPoints.UPDATE_PROFİLE, formData);
     setPendingApiCall(false);
     if (response.success === true) {
       toast.success(response.message);
@@ -85,29 +114,33 @@ const Profile = () => {
     }
   };
   return (
-    <div className="container rounded bg-white mt-5 mb-5">
+    <div className="container mt-5 mb-5">
       <div className="row">
-        <div className="col-md-3 border-right">
-          <div className="d-flex flex-column align-items-center text-center p-3 py-5">
-            <img className="rounded-circle mt-5" width="150px" src={defuser} />
-            <span className="font-weight-bold">{profileInfo?.firstName}</span>
-            <span className="text-black-50">{profileInfo?.email}</span>
-            <div class="d-flex justify-content-center">
-              <div class="btn btn-primary btn-rounded">
-                <label class="form-label text-white m-1" for="customFile2">
-                  Choose file
-                </label>
-                <input
-                  type="file"
-                  class="form-control d-none"
-                  id="customFile2"
-                  onChange={(e) => onChangeImage(e)}
-                />
-              </div>
+        <div className="col-md-4">
+          <div className="card" style={{ width: "18rem" }}>
+            <img
+              className="card-img-top"
+              height={200}
+              src={profileInfo?.imageSrc}
+              alt={profileInfo?.imageName}
+            />
+            <div className="card-body">
+              <h5 className="card-title">
+                {profileInfo?.firstName} {profileInfo?.lastName}
+              </h5>
+              <p className="card-text">{profileInfo?.email}</p>
+              <input
+                type="file"
+                accept=".jpg, .jpeg, .png"
+                className="form-control form-control-sm"
+                id="customFile"
+                onChange={(e) => showPreview(e)}
+              />
             </div>
           </div>
         </div>
-        <div className="col-md-5 border-right">
+
+        <div className="col-md-4 ">
           <div className="p-3 py-5">
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h4 className="text-right">Profile Settings</h4>
@@ -134,35 +167,88 @@ const Profile = () => {
                 />
               </div>
             </div>
+
             <div className="row mt-3">
-              <div className="col-md-12">
-                <label className="labels">Education</label>
+              <div className="col-md-6">
                 <input
-                  type="text"
-                  className="form-control"
-                  placeholder="education"
+                  className="form-check-input"
+                  type="checkbox"
+                  name="IsApproved"
+                  value={profileInfo?.isApproved}
+                  disabled={true}
+                  id="isActiveChk"
+                  onChange={(e) => onChange(e)}
+                />
+                <label className="form-check-label" for="isActiveChk">
+                  Approved
+                </label>
+              </div>
+              <div className="col-md-6">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  value={isPasswordChange}
+                  name="PasswordIsChange"
+                  id="passChk"
+                  onChange={(e) => onChangePassword(e)}
+                />
+                <label className="form-check-label" for="passChk">
+                  Password Change?
+                </label>
+              </div>
+            </div>
+            <div className="row mt-2">
+              <div className="col-md-4">
+                <Input
+                  type="password"
+                  placeholder={t("OldPassword")}
+                  name="OldPassword"
+                  error={errors.OldPassword}
+                  value={OldPassword}
+                  disable={!isPasswordChange}
+                  onChange={(e) => onChange(e)}
+                />
+              </div>
+              <div className="col-md-4">
+                <Input
+                  type="password"
+                  placeholder={t("Password")}
+                  name="Password"
+                  error={errors.Password}
+                  value={Password}
+                  disable={!isPasswordChange}
+                  onChange={(e) => onChange(e)}
+                />
+              </div>
+              <div className="col-md-4">
+                <Input
+                  type="password"
+                  placeholder={t("PasswordRepeat")}
+                  name="PasswordRepeat"
+                  disable={!isPasswordChange}
+                  error={errors.PasswordRepeat}
+                  value={PasswordRepeat}
+                  onChange={(e) => onChange(e)}
                 />
               </div>
             </div>
-            <div className="row mt-3">
-              <div className="col-md-6">
-                <label className="labels">Country</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="country"
-                />
-              </div>
-              <div className="col-md-6">
-                <label className="labels">State/Region</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="state"
+            <div className="row mt-2">
+              <div className="col-md-4">
+                <SelectInput
+                  label="Gender"
+                  defaultOption="Select"
+                  name="Gender"
+                  value={Gender}
+                  error={errors.Gender}
+                  options={genders.map((g) => ({
+                    value: g.val,
+                    text: g.name,
+                  }))}
+                  onChange={(e) => onChange(e)}
                 />
               </div>
             </div>
-            <div className="mt-5 text-center">
+            <div className="mt-5 text-left">
               <button
                 className="btn btn-primary"
                 type="submit"

@@ -3,7 +3,8 @@ import { useAuth } from "../context";
 
 export default function PrivateRoute({ children }) {
   const { isLoggedIn } = useAuth();
-  if (!isLoggedIn) {
+  const token = localStorage.getItem("token");
+  if (token == null) {
     return <Navigate to="/login" />;
   }
   return children;

@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 const Articles = () => {
   const [articles, setArticles] = useState([]);
   const { t } = useTranslation();
-  const Common = t("Common", { returnObjects: true });
 
   useEffect(() => {
     const articles = async () => {
@@ -41,7 +40,7 @@ const Articles = () => {
           </ul>
           <div className="card-body">
             <Link className="btn btn-success" to={"/article/" + a.id}>
-              {Common.detail}
+              {t("Detail")}
             </Link>
           </div>
         </div>
