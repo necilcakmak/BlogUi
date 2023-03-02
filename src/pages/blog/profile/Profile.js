@@ -1,46 +1,44 @@
 import React from "react";
 import Input from "../../../components/Input";
 import { useState, useEffect } from "react";
-import { update, get } from "../../../api/globalServices";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-import SelectInput from "../../../components/SelectInput";
 import endPoints from "../../../EndPoints";
-
+import Button from "../../../components/Button";
+import { httpService } from "../../../tools/httpService";
 const Profile = () => {
   const { t } = useTranslation();
-  const [profileInfo, setProfileInfo] = useState({});
-  const [isPasswordChange, setIsPasswordChange] = useState(false);
+
+  const [imageForm, setImageForm] = useState({});
   const [errors, setErrors] = useState({});
   const [pendingApiCall, setPendingApiCall] = useState(false);
-  const initialValues = {
-    FirstName: "",
-    LastName: "",
-    Gender: false,
-    PasswordIsChange: false,
-    OldPassword: "",
-    Password: "",
-    PasswordRepeat: "",
-    ImageFile: null,
+  const initProfileData = {
+    age: 0,
+    createdDate: "",
+    email: "",
+    firstName: "",
+    gender: false,
+    imageName: "",
+    imageSrc: "",
+    isActive: false,
+    isApproved: false,
+    lastName: "",
+    roleName: "",
+    updatedDate: "",
+    userName: "",
+    userSetting: { newBlog: false, receiveMail: false },
   };
-  const [form, setForm] = useState(initialValues);
-
-  const {
-    FirstName,
-    LastName,
-    Gender,
-    OldPassword,
-    Password,
-    PasswordRepeat,
-    IsApproved,
-  } = form;
-  const genders = [
-    { name: "Man", val: true },
-    { name: "Woman", val: false },
-  ];
+  const [profileInfo, setProfileInfo] = useState(initProfileData);
+  const initPasswordData = {
+    oldPassword: "",
+    password: "",
+    passwordRepeat: "",
+    passwordIsChange: false,
+  };
+  const [passwordData, setPasswordData] = useState(initPasswordData);
   useEffect(() => {
     const profile = async () => {
-      const response = await get(endPoints.GET_MYINFORMATİON);
+      const response = await httpService.get(endPoints.GET_MYINFORMATİON);
       if (response.success) {
         setProfileInfo(response.data);
       } else {
@@ -49,60 +47,74 @@ const Profile = () => {
     };
     profile();
   }, []);
-  const onChangePassword = (e) => {
-    const { name } = e.target;
-    setIsPasswordChange(!isPasswordChange);
-    if (isPasswordChange) {
-      setErrors((previousError) => ({
-        ...previousError,
-        Password: undefined,
-        PasswordRepeat: undefined,
+
+  const onChange = (e) => {
+    const { name, value, checked } = e.target;
+    setErrors((previousError) => ({
+      ...previousError,
+      [name]: undefined,
+    }));
+    if (name === "newBlog") {
+      setProfileInfo((previousForm) => ({
+        ...previousForm,
+        userSetting: { newBlog: checked },
       }));
     }
-
-    setForm((previousForm) => ({
+    setProfileInfo((previousForm) => ({
       ...previousForm,
-      [name]: !isPasswordChange,
+      [name]: value,
     }));
   };
+
+  const onChangePassword = (e) => {
+    const { name, value, checked } = e.target;
+    if (name === "passwordIsChange") {
+      setPasswordData((previousForm) => ({
+        ...previousForm,
+
+        passwordIsChange: checked,
+      }));
+    } else {
+      setPasswordData((previousForm) => ({
+        ...previousForm,
+        [name]: value,
+      }));
+    }
+    if (passwordData.passwordIsChange) {
+      setErrors({
+        password: undefined,
+        passwordRepeat: undefined,
+      });
+    }
+  };
+
   const showPreview = (e) => {
     if (e.target.files && e.target.files[0]) {
-      let ImageFile = e.target.files[0];
-      const objectUrl = URL.createObjectURL(ImageFile);
-      setForm((previousForm) => ({
-        ...previousForm,
-        ImageFile,
-      }));
+      let imageFile = e.target.files[0];
+      const objectUrl = URL.createObjectURL(imageFile);
+      setImageForm(imageFile);
       setProfileInfo((previousForm) => ({
         ...previousForm,
         imageSrc: objectUrl,
       }));
     }
   };
-  const onChange = (e) => {
-    const { name, value } = e.target;
-    setErrors((previousError) => ({
-      ...previousError,
-      [name]: undefined,
-    }));
-    setForm((previousForm) => ({
-      ...previousForm,
-      [name]: value,
-    }));
-  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
+    setPendingApiCall(true);
+
     const formData = new FormData();
-    formData.append("FirstName", form.FirstName);
-    formData.append("LastName", form.LastName);
-    formData.append("Gender", form.Gender);
-    formData.append("PasswordIsChange", form.PasswordIsChange);
-    formData.append("OldPassword", form.OldPassword);
-    formData.append("Password", form.Password);
-    formData.append("PasswordRepeat", form.PasswordRepeat);
-    formData.append("ImageFile", form.ImageFile);
-    formData.append("ImageName", profileInfo.imageName);
-    const response = await update(endPoints.UPDATE_PROFİLE, formData);
+    formData.append("FirstName", profileInfo.firstName);
+    formData.append("LastName", profileInfo.lastName);
+    formData.append("Gender", profileInfo.gender);
+    formData.append("NewBlog", profileInfo.userSetting.newBlog);
+    formData.append("PasswordIsChange", passwordData.passwordIsChange);
+    formData.append("OldPassword", passwordData.oldPassword);
+    formData.append("Password", passwordData.password);
+    formData.append("PasswordRepeat", passwordData.passwordRepeat);
+    formData.append("ImageFile", imageForm);
+    const response = await httpService.put(endPoints.UPDATE_PROFİLE, formData);
     setPendingApiCall(false);
     if (response.success === true) {
       toast.success(response.message);
@@ -113,6 +125,46 @@ const Profile = () => {
       toast.error(response.message);
     }
   };
+  const PassDiv = () => {
+    return (
+      <div className="row mt-2">
+        <div className="col-md-4">
+          <Input
+            type="password"
+            placeholder={t("OldPassword")}
+            name="oldPassword"
+            error={errors.oldPassword}
+            value={passwordData.oldPassword}
+            disable={!passwordData.passwordIsChange}
+            onChange={(e) => onChangePassword(e)}
+          />
+        </div>
+        <div className="col-md-4">
+          <Input
+            type="password"
+            placeholder={t("Password")}
+            name="password"
+            error={errors.password}
+            value={passwordData.password}
+            disable={!passwordData.passwordIsChange}
+            onChange={(e) => onChangePassword(e)}
+          />
+        </div>
+        <div className="col-md-4">
+          <Input
+            type="password"
+            placeholder={t("PasswordRepeat")}
+            name="passwordRepeat"
+            disable={!passwordData.passwordIsChange}
+            error={errors.passwordRepeat}
+            value={passwordData.passwordRepeat}
+            onChange={(e) => onChangePassword(e)}
+          />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="container mt-5 mb-5">
       <div className="row">
@@ -128,7 +180,19 @@ const Profile = () => {
               <h5 className="card-title">
                 {profileInfo?.firstName} {profileInfo?.lastName}
               </h5>
-              <p className="card-text">{profileInfo?.email}</p>
+              <p className="card-text">
+                {profileInfo?.email}
+                <span
+                  className={
+                    "badge " +
+                    (profileInfo?.isApproved
+                      ? "badge-success bg-success"
+                      : "badge-danger bg-danger")
+                  }
+                >
+                  {profileInfo?.isApproved ? "Approved" : "Unapproved"}
+                </span>
+              </p>
               <input
                 type="file"
                 accept=".jpg, .jpeg, .png"
@@ -150,9 +214,9 @@ const Profile = () => {
                 <Input
                   type="text"
                   placeholder={t("FirstName")}
-                  name="FirstName"
-                  error={errors.FirstName}
-                  value={FirstName}
+                  name="firstName"
+                  error={errors.firstName}
+                  value={profileInfo?.firstName}
                   onChange={(e) => onChange(e)}
                 />
               </div>
@@ -160,9 +224,9 @@ const Profile = () => {
                 <Input
                   type="text"
                   placeholder={t("LastName")}
-                  name="LastName"
-                  error={errors.LastName}
-                  value={LastName}
+                  name="lastName"
+                  error={errors.lastName}
+                  value={profileInfo.lastName}
                   onChange={(e) => onChange(e)}
                 />
               </div>
@@ -173,93 +237,46 @@ const Profile = () => {
                 <input
                   className="form-check-input"
                   type="checkbox"
-                  name="IsApproved"
-                  value={profileInfo?.isApproved}
-                  disabled={true}
-                  id="isActiveChk"
-                  onChange={(e) => onChange(e)}
-                />
-                <label className="form-check-label" for="isActiveChk">
-                  Approved
-                </label>
-              </div>
-              <div className="col-md-6">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  value={isPasswordChange}
-                  name="PasswordIsChange"
+                  value={passwordData.passwordIsChange}
+                  name="passwordIsChange"
                   id="passChk"
                   onChange={(e) => onChangePassword(e)}
                 />
-                <label className="form-check-label" for="passChk">
+                <label className="form-check-label" htmlFor="passChk">
                   Password Change?
                 </label>
               </div>
             </div>
-            <div className="row mt-2">
-              <div className="col-md-4">
-                <Input
-                  type="password"
-                  placeholder={t("OldPassword")}
-                  name="OldPassword"
-                  error={errors.OldPassword}
-                  value={OldPassword}
-                  disable={!isPasswordChange}
-                  onChange={(e) => onChange(e)}
-                />
-              </div>
-              <div className="col-md-4">
-                <Input
-                  type="password"
-                  placeholder={t("Password")}
-                  name="Password"
-                  error={errors.Password}
-                  value={Password}
-                  disable={!isPasswordChange}
-                  onChange={(e) => onChange(e)}
-                />
-              </div>
-              <div className="col-md-4">
-                <Input
-                  type="password"
-                  placeholder={t("PasswordRepeat")}
-                  name="PasswordRepeat"
-                  disable={!isPasswordChange}
-                  error={errors.PasswordRepeat}
-                  value={PasswordRepeat}
-                  onChange={(e) => onChange(e)}
-                />
-              </div>
-            </div>
-            <div className="row mt-2">
-              <div className="col-md-4">
-                <SelectInput
-                  label="Gender"
-                  defaultOption="Select"
-                  name="Gender"
-                  value={Gender}
-                  error={errors.Gender}
-                  options={genders.map((g) => ({
-                    value: g.val,
-                    text: g.name,
-                  }))}
-                  onChange={(e) => onChange(e)}
-                />
-              </div>
-            </div>
+            {passwordData.passwordIsChange && <PassDiv />}
+
             <div className="mt-5 text-left">
-              <button
-                className="btn btn-primary"
+              <Button
+                cls="primary"
                 type="submit"
-                disabled={pendingApiCall}
+                pending={pendingApiCall}
                 onClick={(e) => onSubmit(e)}
-              >
-                {pendingApiCall && (
-                  <span className="spinner-border spinner-border-sm"></span>
-                )}
-                Save Profile
-              </button>
+                txt="Save Profile"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="col-md-4 ">
+          <div className="p-3 py-5">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h4 className="text-right">New Post</h4>
+            </div>
+            <div className="form-check form-switch">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id="newPostCheck"
+                name="newBlog"
+                checked={profileInfo?.userSetting?.newBlog}
+                onChange={(e) => onChange(e)}
+              />
+              <label className="form-check-label" htmlFor="newPostCheck">
+                {profileInfo?.userSetting?.newBlog ? t("Yes") : t("No")}
+              </label>
             </div>
           </div>
         </div>

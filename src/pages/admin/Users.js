@@ -5,8 +5,8 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
 import { TriStateCheckbox } from "primereact/tristatecheckbox";
-import { get } from "../../api/globalServices";
-import { Calendar } from 'primereact/calendar';
+import { Calendar } from "primereact/calendar";
+import { httpService } from "../../tools/httpService";
 
 const Users = () => {
   const [users, setUsers] = useState(null);
@@ -17,7 +17,7 @@ const Users = () => {
 
   useEffect(() => {
     const users = async () => {
-      const response = await get("user/getlist");
+      const response = await httpService.get("user/getlist");
       if (response.success) {
         setUsers(response.data);
         setLoading(false);

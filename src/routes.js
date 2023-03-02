@@ -9,6 +9,7 @@ import AdminLayout from "./pages/admin/AdminLayout";
 import AdminHome from "./pages/admin/AdminHome";
 import Users from "./pages/admin/Users";
 import ArticleDetail from "./pages/blog/article/ArticleDetail";
+import Register from "./pages/blog/Register";
 
 const routes = [
   {
@@ -77,6 +78,11 @@ const routes = [
     element: <Login />,
   },
   {
+    path: "register",
+    name: "register",
+    element: <Register />,
+  },
+  {
     path: "*",
     name: "notfound",
     element: <NotFound />,
@@ -85,9 +91,6 @@ const routes = [
 
 const authMap = (routes) =>
   routes.map((route) => {
-    if (route?.profile) {
-      route.element = <PrivateRoute>{route.element}</PrivateRoute>;
-    }
     if (route?.children) {
       route.children = authMap(route.children);
     }

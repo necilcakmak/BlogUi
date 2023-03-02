@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { get } from "../../../api/globalServices";
 import EndPoints from "../../../EndPoints";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
+import { httpService } from "../../../tools/httpService";
 
 const Articles = () => {
   const [articles, setArticles] = useState([]);
@@ -11,7 +11,7 @@ const Articles = () => {
 
   useEffect(() => {
     const articles = async () => {
-      const response = await get(EndPoints.GET_ARTICLES);
+      const response =await httpService.get(EndPoints.GET_ARTICLES);
       if (response.success) {
         setArticles(response.data);
       } else {

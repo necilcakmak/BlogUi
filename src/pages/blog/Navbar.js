@@ -2,8 +2,8 @@ import React, { Fragment, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context";
 import { useTranslation } from "react-i18next";
-import tr from '../../assets/tr.png'
-import uk from '../../assets/uk.png'
+import tr from "../../assets/tr.png";
+import uk from "../../assets/uk.png";
 const Navbar = () => {
   const { t, i18n } = useTranslation();
   const { isLoggedIn, setIsLoggedIn, setUser } = useAuth();
@@ -30,20 +30,15 @@ const Navbar = () => {
           {t("Login")}
         </Link>
       </li>
+      <li className="nav-item">
+        <Link className="nav-link" to="/register">
+          {t("Register")}
+        </Link>
+      </li>
     </Fragment>
   );
   const authLinks = () => (
     <Fragment>
-      <li className="nav-item">
-        <Link
-          className="nav-link"
-          style={{ cursor: "pointer" }}
-          to="/"
-          onClick={logout}
-        >
-          {t("Logout")}
-        </Link>
-      </li>
       <li className="nav-item">
         <Link className="nav-link" to="/profile">
           {t("Profile")}
@@ -52,6 +47,16 @@ const Navbar = () => {
       <li className="nav-item">
         <Link className="nav-link" to="/admin">
           {t("Admin")}
+        </Link>
+      </li>
+      <li className="nav-item">
+        <Link
+          className="nav-link"
+          style={{ cursor: "pointer" }}
+          to="/"
+          onClick={logout}
+        >
+          {t("Logout")}
         </Link>
       </li>
     </Fragment>
@@ -97,7 +102,7 @@ const Navbar = () => {
             </li>
             <li className="nav-item">
               <img
-                 src={uk}
+                src={uk}
                 alt="English"
                 onClick={() => onChangeLang("en")}
                 style={{ cursor: "pointer", width: 24, height: 24 }}

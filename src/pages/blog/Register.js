@@ -2,25 +2,28 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import Input from "../../components/Input";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context";
 import EndPoints from "../../EndPoints";
 import { useTranslation } from "react-i18next";
 import { httpService } from "../../tools/httpService";
-import { Link } from "react-router-dom";
 import Button from "../../components/Button";
-
-const Login = () => {
+import { Link } from "react-router-dom";
+const Register = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { setIsLoggedIn, setUser } = useAuth();
   const [errors, setErrors] = useState({});
   const [pendingApiCall, setPendingApiCall] = useState(false);
   const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    userName: "",
     password: "",
+    gender: true,
+    birthDate: "1995-12-12",
     email: "",
   });
 
-  const { email, password } = form;
+  const { email, password, firstName, lastName, userName, gender, birthDate } =
+    form;
   const onChange = (e) => {
     const { name, value } = e.target;
     setErrors((previousError) => ({
@@ -34,24 +37,13 @@ const Login = () => {
   };
   const onSubmit = async (e) => {
     e.preventDefault();
-    const cred = {
-      email,
-      password,
-    };
     setPendingApiCall(true);
-    const response = await httpService.post(EndPoints.LOGIN_URL, cred);
+    const response = await httpService.post(EndPoints.REGISTER_URL, form);
+
     setPendingApiCall(false);
     if (response.success === true) {
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
       toast.success(response.message);
-
-      setIsLoggedIn(true);
-      setUser(response.data.user);
-      if (response.data.user.roleName === "admin") {
-        navigate("/admin");
-      }
-      navigate("/");
+      navigate("/login");
     } else {
       if (response.validationErrors !== undefined) {
         setErrors(response.validationErrors);
@@ -63,8 +55,32 @@ const Login = () => {
     <div className="container mt-5">
       <div className="row justify-content-md-center">
         <div className="col-sm-5">
-          <h3 className="text-center">{t("LoginPage")}</h3>
-          <form>
+          <h3 className="text-center">{t("RegisterPage")}</h3>
+          <form onSubmit={(e) => onSubmit(e)}>
+            <Input
+              type="text"
+              placeholder={t("firstName")}
+              name="firstName"
+              error={errors.firstName}
+              value={firstName}
+              onChange={(e) => onChange(e)}
+            />
+            <Input
+              type="text"
+              placeholder={t("lastName")}
+              name="lastName"
+              error={errors.lastName}
+              value={lastName}
+              onChange={(e) => onChange(e)}
+            />
+            <Input
+              type="text"
+              placeholder={t("userName")}
+              name="userName"
+              error={errors.userName}
+              value={userName}
+              onChange={(e) => onChange(e)}
+            />
             <Input
               type="text"
               placeholder={t("Email")}
@@ -82,6 +98,33 @@ const Login = () => {
               onChange={(e) => onChange(e)}
               minLength="3"
             />
+            <div style={{ flexDirection: "row" }}>
+              <div className="form-group">
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name="gender"
+                  id="manRadio"
+                  value={true}
+                  onClick={(e) => onChange(e)}
+                />
+                <label className="form-check-label" htmlFor="manRadio">
+                  Man
+                </label>
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name="gender"
+                  id="womanRadio"
+                  value={false}
+                  onClick={(e) => onChange(e)}
+                />
+                <label className="form-check-label" htmlFor="womanRadio">
+                  Woman
+                </label>
+              </div>
+            </div>
+
             {errors.Hata && (
               <div className="alert alert-danger">{errors.hata}</div>
             )}
@@ -91,12 +134,12 @@ const Login = () => {
               cls="primary"
               type="submit"
               pendingApiCall={pendingApiCall}
-              txt={t("Login")}
+              txt={t("Register")}
               onClick={(e) => onSubmit(e)}
             />
             <div style={{ float: "right" }}>
-              <Link className="btn btn-primary" to="/register">
-                {t("Register")}
+              <Link className="btn btn-primary" to="/login">
+                {t("Login")}
               </Link>
             </div>
           </div>
@@ -106,4 +149,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
