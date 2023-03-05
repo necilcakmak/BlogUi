@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from "react";
-import EndPoints from "../../../EndPoints";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
-import { httpService } from "../../../tools/httpService";
+import { ArticleService } from "../../../services/ArticleService";
 
 const ArticleDetail = () => {
   let { id } = useParams();
-
+  const articleService = new ArticleService();
   const [article, setArticle] = useState({});
   const { t } = useTranslation();
   useEffect(() => {
     const article = async () => {
-      const response =await httpService.get(EndPoints.GET_ARTICLE + id);
+      const response = await articleService.getArticleById(id);
       if (response.success) {
         setArticle(response.data);
       } else {

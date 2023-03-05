@@ -1,14 +1,14 @@
-import React from "react";
+import React, { Fragment } from "react";
 import Input from "../../../components/Input";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-import endPoints from "../../../EndPoints";
 import Button from "../../../components/Button";
-import { httpService } from "../../../tools/httpService";
+import { UserService } from "../../../services/UserService";
+
 const Profile = () => {
   const { t } = useTranslation();
-
+  const userService = new UserService();
   const [imageForm, setImageForm] = useState({});
   const [errors, setErrors] = useState({});
   const [pendingApiCall, setPendingApiCall] = useState(false);
@@ -38,7 +38,7 @@ const Profile = () => {
   const [passwordData, setPasswordData] = useState(initPasswordData);
   useEffect(() => {
     const profile = async () => {
-      const response = await httpService.get(endPoints.GET_MYINFORMATİON);
+      const response = await userService.getMyInformation();
       if (response.success) {
         setProfileInfo(response.data);
       } else {
@@ -46,7 +46,7 @@ const Profile = () => {
       }
     };
     profile();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onChange = (e) => {
     const { name, value, checked } = e.target;
@@ -82,6 +82,7 @@ const Profile = () => {
     }
     if (passwordData.passwordIsChange) {
       setErrors({
+        oldPassword: undefined,
         password: undefined,
         passwordRepeat: undefined,
       });
@@ -103,7 +104,6 @@ const Profile = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     setPendingApiCall(true);
-
     const formData = new FormData();
     formData.append("FirstName", profileInfo.firstName);
     formData.append("LastName", profileInfo.lastName);
@@ -114,8 +114,9 @@ const Profile = () => {
     formData.append("Password", passwordData.password);
     formData.append("PasswordRepeat", passwordData.passwordRepeat);
     formData.append("ImageFile", imageForm);
-    const response = await httpService.put(endPoints.UPDATE_PROFİLE, formData);
+    const response = await userService.updateMyProfile(formData);
     setPendingApiCall(false);
+    debugger;
     if (response.success === true) {
       toast.success(response.message);
     } else {
@@ -125,8 +126,8 @@ const Profile = () => {
       toast.error(response.message);
     }
   };
-  const PassDiv = () => {
-    return (
+  const PassDiv = () => (
+    <Fragment>
       <div className="row mt-2">
         <div className="col-md-4">
           <Input
@@ -134,8 +135,8 @@ const Profile = () => {
             placeholder={t("OldPassword")}
             name="oldPassword"
             error={errors.oldPassword}
-            value={passwordData.oldPassword}
-            disable={!passwordData.passwordIsChange}
+            value={passwordData?.oldPassword}
+            disable={!passwordData?.passwordIsChange}
             onChange={(e) => onChangePassword(e)}
           />
         </div>
@@ -145,8 +146,8 @@ const Profile = () => {
             placeholder={t("Password")}
             name="password"
             error={errors.password}
-            value={passwordData.password}
-            disable={!passwordData.passwordIsChange}
+            value={passwordData?.password}
+            disable={!passwordData?.passwordIsChange}
             onChange={(e) => onChangePassword(e)}
           />
         </div>
@@ -155,15 +156,15 @@ const Profile = () => {
             type="password"
             placeholder={t("PasswordRepeat")}
             name="passwordRepeat"
-            disable={!passwordData.passwordIsChange}
+            disable={!passwordData?.passwordIsChange}
             error={errors.passwordRepeat}
-            value={passwordData.passwordRepeat}
+            value={passwordData?.passwordRepeat}
             onChange={(e) => onChangePassword(e)}
           />
         </div>
       </div>
-    );
-  };
+    </Fragment>
+  );
 
   return (
     <div className="container mt-5 mb-5">
@@ -226,7 +227,7 @@ const Profile = () => {
                   placeholder={t("LastName")}
                   name="lastName"
                   error={errors.lastName}
-                  value={profileInfo.lastName}
+                  value={profileInfo?.lastName}
                   onChange={(e) => onChange(e)}
                 />
               </div>
@@ -237,7 +238,7 @@ const Profile = () => {
                 <input
                   className="form-check-input"
                   type="checkbox"
-                  value={passwordData.passwordIsChange}
+                  value={passwordData?.passwordIsChange}
                   name="passwordIsChange"
                   id="passChk"
                   onChange={(e) => onChangePassword(e)}
@@ -247,7 +248,7 @@ const Profile = () => {
                 </label>
               </div>
             </div>
-            {passwordData.passwordIsChange && <PassDiv />}
+            {passwordData?.passwordIsChange ? PassDiv() : ""}
 
             <div className="mt-5 text-left">
               <Button

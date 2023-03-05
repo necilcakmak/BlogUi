@@ -41,6 +41,17 @@ const AdminLayout = () => {
         },
       ],
     },
+    {
+      label: "Article Components",
+      icon: "pi pi-fw pi-sitemap",
+      items: [
+        {
+          label: "Articles",
+          icon: "pi pi-fw pi-id-card",
+          to: "/admin/articles",
+        },
+      ],
+    },
   ];
 
   let menuClick = false;

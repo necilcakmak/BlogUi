@@ -6,18 +6,27 @@ import { Column } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
 import { TriStateCheckbox } from "primereact/tristatecheckbox";
 import { Calendar } from "primereact/calendar";
-import { httpService } from "../../tools/httpService";
+import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
+import { toast } from "react-toastify";
+import { Toolbar } from "primereact/toolbar";
+import { InputText } from "primereact/inputtext";
+import { UserService } from "../../services/UserService";
 
 const Users = () => {
+  const userService = new UserService();
   const [users, setUsers] = useState(null);
+  const [user, setUser] = useState(null);
   const [filters, setFilters] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [deleteUserDialog, setDeleteUserDialog] = useState(false);
+  const [deleteUsersDialog, setDeleteUsersDialog] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState(null);
+  const [globalFilter, setGlobalFilter] = useState(null);
   const statuses = ["true", "false"];
-
   useEffect(() => {
     const users = async () => {
-      const response = await httpService.get("user/getlist");
+      const response = await userService.getUserList();
       if (response.success) {
         setUsers(response.data);
         setLoading(false);
@@ -26,7 +35,7 @@ const Users = () => {
 
     initFilters();
     users();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const initFilters = () => {
     setFilters({
@@ -113,31 +122,171 @@ const Users = () => {
       <Calendar
         value={options.value}
         onChange={(e) => options.filterCallback(e.value, options.index)}
-        dateFormat="mm/dd/yy"
-        placeholder="mm/dd/yyyy"
+        dateFormat="dd/mm/yy"
+        placeholder="dd/mm/yyyy"
         mask="99/99/9999"
       />
     );
   };
+  const actionBodyTemplate = (rowData) => {
+    return (
+      <>
+        <Button
+          icon="pi pi-trash"
+          className="p-button-rounded p-button-warning"
+          onClick={() => confirmDeleteUser(rowData)}
+        />
+      </>
+    );
+  };
+  const confirmDeleteUser = (user) => {
+    setUser(user);
+    setDeleteUserDialog(true);
+  };
+  const hideDeleteUserDialog = () => {
+    setDeleteUserDialog(false);
+  };
+  const deleteUser = async () => {
+    const response = await userService.deleteUserById(user.id);
+    if (response.success) {
+      let _users = users.filter((val) => val.id !== user.id);
+      setUsers(_users);
+      setDeleteUserDialog(false);
+      setUser(null);
+      toast.success(response.message);
+    } else {
+      setDeleteUserDialog(false);
+      toast.error(response.message);
+    }
+  };
+  const deleteSelectedUsers = async () => {
+    let idList = selectedUsers.map((v) => v.id);
+    debugger;
+    const response = await userService.deleteUsersByIdList(idList);
+    if (response.success) {
+      let _users = users.filter((val) => !selectedUsers.includes(val));
+      setUsers(_users);
+      setDeleteUsersDialog(false);
+      setSelectedUsers(null);
+      toast.success(response.message);
+    } else {
+      setDeleteUsersDialog(false);
+      toast.error(response.message);
+    }
+  };
+  const imageBodyTemplate = (rowData) => {
+    return (
+      <>
+        <span className="p-column-title">Image</span>
+        <img
+          src={`https://localhost:44322/images/users/${rowData.imageName}`}
+          alt={rowData.imageName}
+          className="shadow-2"
+          width="100"
+        />
+      </>
+    );
+  };
+  const deleteUserDialogFooter = (
+    <>
+      <Button
+        label="No"
+        icon="pi pi-times"
+        className="p-button-text"
+        onClick={hideDeleteUserDialog}
+      />
+      <Button
+        label="Yes"
+        icon="pi pi-check"
+        className="p-button-text"
+        onClick={deleteUser}
+      />
+    </>
+  );
+  const header = (
+    <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+      <h5 className="m-0">Manage Users</h5>
+      <span className="block mt-2 md:mt-0 p-input-icon-left">
+        <i className="pi pi-search" />
+        <InputText
+          type="search"
+          onInput={(e) => setGlobalFilter(e.target.value)}
+          placeholder="Search..."
+        />
+      </span>
+    </div>
+  );
+  const hideDeleteUsersDialog = () => {
+    setDeleteUsersDialog(false);
+  };
 
+  const deleteUsersDialogFooter = (
+    <>
+      <Button
+        label="No"
+        icon="pi pi-times"
+        className="p-button-text"
+        onClick={hideDeleteUsersDialog}
+      />
+      <Button
+        label="Yes"
+        icon="pi pi-check"
+        className="p-button-text"
+        onClick={deleteSelectedUsers}
+      />
+    </>
+  );
+
+  const leftToolbarTemplate = () => {
+    return (
+      <React.Fragment>
+        <div className="my-2">
+          <Button
+            label="New"
+            icon="pi pi-plus"
+            className="p-button-success mr-2"
+          />
+          <Button
+            label="Delete"
+            icon="pi pi-trash"
+            className="p-button-danger"
+            onClick={confirmDeleteSelected}
+            disabled={!selectedUsers || !selectedUsers.length}
+          />
+        </div>
+      </React.Fragment>
+    );
+  };
+  const confirmDeleteSelected = () => {
+    setDeleteUsersDialog(true);
+  };
   return (
     <div className="grid table-demo">
       <div className="col-12">
         <div className="card">
-          <h5>User List</h5>
+          <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
           <DataTable
             value={users}
+            selection={selectedUsers}
+            onSelectionChange={(e) => setSelectedUsers(e.value)}
             paginator
-            className="p-datatable-gridlines"
+            className="datatable-responsive"
             showGridlines
             rows={10}
+            rowsPerPageOptions={[5, 10, 25]}
             dataKey="id"
             filters={filters}
             filterDisplay="menu"
             loading={loading}
+            globalFilter={globalFilter}
+            header={header}
             responsiveLayout="scroll"
             emptyMessage="No users found."
           >
+            <Column
+              selectionMode="multiple"
+              headerStyle={{ width: "4rem" }}
+            ></Column>
             <Column
               field="firstName"
               header="Name"
@@ -152,6 +301,7 @@ const Users = () => {
               filterPlaceholder="Search by email"
               style={{ minWidth: "12rem" }}
             />
+            <Column header="Image" body={imageBodyTemplate}></Column>
             <Column
               header="CreatedDate"
               filterField="createdDate"
@@ -180,7 +330,48 @@ const Users = () => {
               filter
               filterElement={verifiedFilterTemplate}
             />
+            <Column
+              header="Action"
+              body={actionBodyTemplate}
+              headerStyle={{ minWidth: "10rem" }}
+            ></Column>
           </DataTable>
+          <Dialog
+            visible={deleteUserDialog}
+            style={{ width: "450px" }}
+            header="Confirm"
+            modal
+            footer={deleteUserDialogFooter}
+            onHide={hideDeleteUserDialog}
+          >
+            <div className="flex align-items-center justify-content-center">
+              <i
+                className="pi pi-exclamation-triangle mr-3"
+                style={{ fontSize: "2rem" }}
+              />
+              {user && (
+                <span>
+                  Are you sure you want to delete <b>{user.email}</b>?
+                </span>
+              )}
+            </div>
+          </Dialog>
+          <Dialog
+            visible={deleteUsersDialog}
+            style={{ width: "450px" }}
+            header="Confirm"
+            modal
+            footer={deleteUsersDialogFooter}
+            onHide={hideDeleteUsersDialog}
+          >
+            <div className="flex align-items-center justify-content-center">
+              <i
+                className="pi pi-exclamation-triangle mr-3"
+                style={{ fontSize: "2rem" }}
+              />
+              {<span>Are you sure you want to delete the selected users?</span>}
+            </div>
+          </Dialog>
         </div>
       </div>
     </div>

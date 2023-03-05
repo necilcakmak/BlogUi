@@ -3,13 +3,13 @@ import { toast } from "react-toastify";
 import Input from "../../components/Input";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context";
-import EndPoints from "../../EndPoints";
 import { useTranslation } from "react-i18next";
-import { httpService } from "../../tools/httpService";
 import { Link } from "react-router-dom";
 import Button from "../../components/Button";
+import { AuthService } from "../../services/AuthService";
 
 const Login = () => {
+  const authService = new AuthService();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { setIsLoggedIn, setUser } = useAuth();
@@ -39,7 +39,7 @@ const Login = () => {
       password,
     };
     setPendingApiCall(true);
-    const response = await httpService.post(EndPoints.LOGIN_URL, cred);
+    const response = await authService.login(cred);
     setPendingApiCall(false);
     if (response.success === true) {
       localStorage.setItem("token", response.data.token);

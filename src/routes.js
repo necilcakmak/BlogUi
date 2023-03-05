@@ -7,9 +7,10 @@ import BlogLayout from "./pages/blog/BlogLayout";
 import NotFound from "./pages/NotFound";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminHome from "./pages/admin/AdminHome";
-import Users from "./pages/admin/Users";
 import ArticleDetail from "./pages/blog/article/ArticleDetail";
 import Register from "./pages/blog/Register";
+import Users from "./pages/admin/Users";
+import AArticles from "./pages/admin/Articles";
 
 const routes = [
   {
@@ -64,6 +65,11 @@ const routes = [
         path: "users",
         name: "users",
         element: <Users />,
+      },
+      {
+        path: "articles",
+        name: "articles",
+        element: <AArticles />,
       },
       {
         path: "*",

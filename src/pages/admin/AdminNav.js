@@ -29,6 +29,15 @@ const AdminNav = () => {
             </li>
           </ul>
         </div>
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <ul className="navbar-nav">
+            <li className="nav-item">
+              <Link className="nav-link" to="/admin/articles">
+                {t("Articles")}
+              </Link>
+            </li>
+          </ul>
+        </div>
         <Link className="navbar-brand" to="/">
           Site
         </Link>

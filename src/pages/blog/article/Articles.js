@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import EndPoints from "../../../EndPoints";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-import { httpService } from "../../../tools/httpService";
+import { ArticleService } from "../../../services/ArticleService";
 
 const Articles = () => {
   const [articles, setArticles] = useState([]);
   const { t } = useTranslation();
-
+  const articleService = new ArticleService();
   useEffect(() => {
     const articles = async () => {
-      const response =await httpService.get(EndPoints.GET_ARTICLES);
+      const response = await articleService.getArticleList();
       if (response.success) {
         setArticles(response.data);
       } else {
@@ -19,7 +18,7 @@ const Articles = () => {
       }
     };
     articles();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <div className="container p-3">
       <h5 className="float-left p-2">Article List</h5>

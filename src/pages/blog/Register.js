@@ -2,23 +2,26 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import Input from "../../components/Input";
 import { useNavigate } from "react-router-dom";
-import EndPoints from "../../EndPoints";
 import { useTranslation } from "react-i18next";
-import { httpService } from "../../tools/httpService";
 import Button from "../../components/Button";
 import { Link } from "react-router-dom";
+import { AuthService } from "../../services/AuthService";
+import { Calendar } from "primereact/calendar";
+
 const Register = () => {
+  const authService = new AuthService();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
   const [pendingApiCall, setPendingApiCall] = useState(false);
+  const [calendarValue, setCalendarValue] = useState(null);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
     userName: "",
     password: "",
     gender: true,
-    birthDate: "1995-12-12",
+    birthDate: "",
     email: "",
   });
 
@@ -38,7 +41,7 @@ const Register = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     setPendingApiCall(true);
-    const response = await httpService.post(EndPoints.REGISTER_URL, form);
+    const response = await authService.register(form);
 
     setPendingApiCall(false);
     if (response.success === true) {
@@ -98,6 +101,16 @@ const Register = () => {
               onChange={(e) => onChange(e)}
               minLength="3"
             />
+            <div className="form-group">
+              <Calendar
+                showIcon
+                showButtonBar
+                value={birthDate}
+                name="birthDate"
+                onChange={(e) => onChange(e)}
+              ></Calendar>
+            </div>
+
             <div style={{ flexDirection: "row" }}>
               <div className="form-group">
                 <input
@@ -106,6 +119,7 @@ const Register = () => {
                   name="gender"
                   id="manRadio"
                   value={true}
+                  defaultChecked
                   onClick={(e) => onChange(e)}
                 />
                 <label className="form-check-label" htmlFor="manRadio">
