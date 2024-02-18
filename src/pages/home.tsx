@@ -1,52 +1,49 @@
-import { ModalContext, useModal } from "contexts/modalContext";
-import { useContext, useState } from "react";
-import DataTable from "react-data-table-component";
+import endPoints from "EndPoints";
+import { useModal } from "contexts/modalContext";
+import { ArticleDto } from "interfaces/article/article";
+import { useEffect, useState } from "react";
+import DataTable, { TableProps } from "react-data-table-component";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import ApiService from "services/apiService";
+
 
 const Home = () => {
   const { t } = useTranslation();
-  const { onClose, toggleModal, setBodyy, onConfirm } = useModal();
-
+  const { open, setOpen } = useModal();
+  const [articles, setArticles] = useState<ArticleDto[]>([]);
   const handleModal = () => {
-    toggleModal();
-    setBodyy("test");
-    onClose();
+    setOpen(!open);
   };
+  useEffect(() => {
+    getArticles();
+  }, []);
+  const getArticles = async () => {
+    var response = await ApiService.get<ArticleDto[]>(endPoints.GET_ARTICLES);
+    if (response.success) {
+      setArticles(response.data);
+    }else{
+      toast.error(response.message)
+    }
+  };
+
   const columns = [
     {
-      name: "Title",
-      selector: (row: any) => row.title,
+      name: "title",
+      selector: (row: ArticleDto) => row.title,
     },
     {
-      name: "Year",
-      selector: (row: any) => row.year,
+      name: "content",
+      selector: (row: ArticleDto) => row.content,
       sortable: true,
-    },
-  ];
-  const data = [
-    {
-      id: 1,
-      title: "Beetlejuice",
-      year: "1988",
-    },
-    {
-      id: 2,
-      title: "Ghostbusters",
-      year: "1984",
-    },
-    {
-      id: 3,
-      title: "Beetlejuice",
-      year: "1980",
     },
   ];
   return (
     <div className="container p-3">
       <div className="row">
         <h3>Home Page</h3>
-        <DataTable columns={columns} data={data} pagination />
+        <DataTable columns={columns} data={articles} pagination />
       </div>
       <div className="row"></div>
       <Link className="btn btn-success" to="/login">

@@ -1,6 +1,5 @@
-import { ModalContext, useModal } from "contexts/modalContext";
-import { ModalProps } from "interfaces/modalProps";
-import { FC, useContext, useState } from "react";
+import { useModal } from "contexts/modalContext";
+import { FC } from "react";
 
 const Modal = (): ReturnType<FC> => {
   const { body, onClose, onConfirm, open, title } = useModal();

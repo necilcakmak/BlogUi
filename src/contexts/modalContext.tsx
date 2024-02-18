@@ -1,39 +1,40 @@
 import Modal from "components/modal";
 import { ModalProps } from "interfaces/modalProps";
-import { createContext, useContext, useState } from "react";
+import { ReactNode, createContext, useContext, useState } from "react";
 
-const defaultValue = {
+type ModalProviderProps = {
+  children: ReactNode;
+};
+
+const defaultValue: ModalProps = {
   body: "",
+  setBody: () => {},
   onClose: () => {},
-  onConfirm: () => {},
-  toggleModal: () => {},
-  setBodyy: (val: string) => {},
+  onConfirm: (e: React.MouseEvent<HTMLButtonElement>) => {},
   open: false,
+  setOpen: () => {},
   title: "",
+  setTitle: () => {},
 };
 
 export const ModalContext = createContext(defaultValue);
-const ModalProvider = ({ children }: any) => {
+const ModalProvider = ({ children }: ModalProviderProps) => {
   const [open, setOpen] = useState<boolean>(false);
-  const [body, setBody] = useState<string>("");
-  const [title, setTitle] = useState<string>("");
-  const toggleModal = () => {
-    setOpen(!open);
-  };
+  const [body, setBody] = useState<string>("modal body");
+  const [title, setTitle] = useState<string>("modal title");
   const onClose = () => {
-    setOpen(!open);
+    setOpen(false);
   };
-  const setBodyy = (val: string) => {
-    setBody(val);
+  const onConfirm = (e: React.MouseEvent<HTMLButtonElement>) => {
+    
   };
-  const data = {
+  const data: ModalProps = {
+    onConfirm,
     onClose,
-    onConfirm: () => {},
-    toggleModal,
     open,
     setOpen,
     body,
-    setBodyy,
+    setBody,
     title,
     setTitle,
   };

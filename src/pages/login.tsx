@@ -1,12 +1,12 @@
 import React, { ChangeEvent, useState } from "react";
 import Input from "../components/input";
 import { Button } from "../components/button";
-import { post } from "../services/httpServices";
 import { useTranslation } from "react-i18next";
 import endPoints from "EndPoints";
 import { Link, useNavigate } from "react-router-dom";
 import { AccessToken } from "interfaces/accessToken";
 import { toast } from "react-toastify";
+import ApiService from "services/apiService";
 
 interface LoginError {
   email?: string;
@@ -41,7 +41,7 @@ const Login = () => {
       email,
       password,
     };
-    var response = await post<AccessToken>(endPoints.LOGIN_URL, cred);
+    const response = await ApiService.post<AccessToken>(endPoints.LOGIN_URL, cred);
     if (response.success === true) {
       localStorage.setItem("token", JSON.stringify(response.data?.token));
       localStorage.setItem("user", JSON.stringify(response.data?.user));

@@ -1,9 +1,12 @@
-import { ReactElement } from "react";
+import { Dispatch, SetStateAction } from "react";
 
 export interface ModalProps {
-    open: boolean;
-    onClose: () => void;
-    onConfirm?: ((event: React.MouseEvent<HTMLButtonElement>) => void) | undefined;
-    title:string;
-    body:string;
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  onClose: () => void;
+  onConfirm?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | undefined;
+  title: string;
+  setTitle: Dispatch<SetStateAction<string>>;
+  body: string;
+  setBody: Dispatch<SetStateAction<string>>;
 }
