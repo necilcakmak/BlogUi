@@ -1,49 +1,48 @@
-import Modal from "components/modal";
-import { ModalProps } from "interfaces/modalProps";
+import { Modal } from "components/modal";
+import { ModalContextProps } from "interfaces/modalContextProps";
 import { ReactNode, createContext, useContext, useState } from "react";
 
-type ModalProviderProps = {
-  children: ReactNode;
-};
+const ModalContext = createContext<ModalContextProps | undefined>(undefined);
 
-const defaultValue: ModalProps = {
-  body: "",
-  setBody: () => {},
-  onClose: () => {},
-  onConfirm: (e: React.MouseEvent<HTMLButtonElement>) => {},
-  open: false,
-  setOpen: () => {},
-  title: "",
-  setTitle: () => {},
-};
+export const ModalProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const [modalMessage, setModalMessage] = useState("");
+  const [onConfirmCallback, setOnConfirmCallback] = useState<() => void>(
+    () => () => {}
+  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-export const ModalContext = createContext(defaultValue);
-const ModalProvider = ({ children }: ModalProviderProps) => {
-  const [open, setOpen] = useState<boolean>(false);
-  const [body, setBody] = useState<string>("modal body");
-  const [title, setTitle] = useState<string>("modal title");
-  const onClose = () => {
-    setOpen(false);
+  const showModal = (message: string, onConfirm: () => void) => {
+    setModalMessage(message);
+    setOnConfirmCallback(() => onConfirm);
+    setIsModalOpen(true);
   };
-  const onConfirm = (e: React.MouseEvent<HTMLButtonElement>) => {
-    
+
+  const hideModal = () => {
+    setIsModalOpen(false);
   };
-  const data: ModalProps = {
-    onConfirm,
-    onClose,
-    open,
-    setOpen,
-    body,
-    setBody,
-    title,
-    setTitle,
-  };
+
   return (
-    <ModalContext.Provider value={data}>
-      <Modal />
+    <ModalContext.Provider value={{ showModal, hideModal }}>
       {children}
+      <Modal
+        isOpen={isModalOpen}
+        message={modalMessage}
+        onClose={hideModal}
+        onConfirm={() => {
+          onConfirmCallback();
+          hideModal();
+        }}
+      />
     </ModalContext.Provider>
   );
 };
-export const useModal = () => useContext(ModalContext);
-export default ModalProvider;
+
+export const useModal = () => {
+  const context = useContext(ModalContext);
+  if (!context) {
+    throw new Error("useModal must be used within a ModalProvider");
+  }
+  return context;
+};

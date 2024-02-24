@@ -1,21 +1,17 @@
 import endPoints from "EndPoints";
-import { useModal } from "contexts/modalContext";
 import { ArticleDto } from "interfaces/article/article";
 import { useEffect, useState } from "react";
-import DataTable, { TableProps } from "react-data-table-component";
+import DataTable from "react-data-table-component";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import ApiService from "services/apiService";
 
-
 const Home = () => {
   const { t } = useTranslation();
-  const { open, setOpen } = useModal();
+
   const [articles, setArticles] = useState<ArticleDto[]>([]);
-  const handleModal = () => {
-    setOpen(!open);
-  };
+
   useEffect(() => {
     getArticles();
   }, []);
@@ -23,8 +19,8 @@ const Home = () => {
     var response = await ApiService.get<ArticleDto[]>(endPoints.GET_ARTICLES);
     if (response.success) {
       setArticles(response.data);
-    }else{
-      toast.error(response.message)
+    } else {
+      toast.error(response.message);
     }
   };
 
@@ -49,9 +45,6 @@ const Home = () => {
       <Link className="btn btn-success" to="/login">
         {t("Login")}
       </Link>
-      <button className="btn btn-warning" onClick={handleModal}>
-        modal
-      </button>
     </div>
   );
 };

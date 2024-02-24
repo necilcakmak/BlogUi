@@ -1,27 +1,37 @@
-import { useModal } from "contexts/modalContext";
-import { FC } from "react";
+import { ConfirmationModalProps } from "interfaces/modalContextProps";
+import React from "react";
 
-const Modal = (): ReturnType<FC> => {
-  const { body, onClose, onConfirm, open, title } = useModal();
+export const Modal: React.FC<ConfirmationModalProps> = ({
+  isOpen,
+  message,
+  onClose,
+  onConfirm,
+}) => {
+  if (!isOpen) return null;
 
   return (
-    <div className={`${"modal"} ${open ? "display-block" : "display-none"}`}>
+    <div className={`${"modal"} ${"display-block"}`}>
       <div className="modal-main">
         <div className="modal-head">
-          <h1>{title}</h1>
+          <h5 className="modal-title">Uyarı</h5>
         </div>
-        <div className="modal-body">{body}</div>
-        <div className="btn-container">
-          <button type="button" className="btn btn-danger" onClick={onClose}>
-            Hayır
-          </button>
-          <button type="button" className="btn btn-success" onClick={onConfirm}>
+        <div className="modal-body">
+          <p>{message}</p>
+        </div>
+        <div className="modal-footer">
+          <button type="button" className="btn btn-primary" onClick={onConfirm}>
             Evet
+          </button>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            data-dismiss="modal"
+            onClick={onClose}
+          >
+            Hayır
           </button>
         </div>
       </div>
     </div>
   );
 };
-
-export default Modal;

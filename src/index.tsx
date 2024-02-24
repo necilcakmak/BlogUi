@@ -9,7 +9,8 @@ import "bootstrap/dist/js/bootstrap.bundle.min";
 import "./i18n";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
-import ModalProvider from "contexts/modalContext";
+import { ModalProvider } from "contexts/modalContext";
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );

@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AccessToken } from "interfaces/accessToken";
 import { toast } from "react-toastify";
 import ApiService from "services/apiService";
+import { useModal } from "contexts/modalContext";
 
 interface LoginError {
   email?: string;
@@ -15,6 +16,7 @@ interface LoginError {
 }
 const Login = () => {
   const { t } = useTranslation();
+  const { showModal } = useModal();
   const [errors, setErrors] = useState<LoginError>({});
   const navigate = useNavigate();
   const [pendingApiCall, setPendingApiCall] = useState(false);
@@ -35,13 +37,22 @@ const Login = () => {
       [name]: value,
     }));
   };
+
+  const handleShowModal = (e: React.MouseEvent<HTMLButtonElement>) => {
+    showModal("Devam etmek istiyor musunuz?", () => {
+      onSubmit(e);
+    });
+  };
   const onSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const cred = {
       email,
       password,
     };
-    const response = await ApiService.post<AccessToken>(endPoints.LOGIN_URL, cred);
+    const response = await ApiService.post<AccessToken>(
+      endPoints.LOGIN_URL,
+      cred
+    );
     if (response.success === true) {
       localStorage.setItem("token", JSON.stringify(response.data?.token));
       localStorage.setItem("user", JSON.stringify(response.data?.user));
@@ -88,7 +99,9 @@ const Login = () => {
               type="submit"
               pendingApiCall={pendingApiCall}
               text={t("Login")}
-              onClick={(e: React.MouseEvent<HTMLButtonElement>) => onSubmit(e)}
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                handleShowModal(e)
+              }
             />
             <div style={{ float: "right" }}>
               <Link className="btn btn-primary" to="/">
