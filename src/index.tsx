@@ -10,15 +10,20 @@ import "./i18n";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { ModalProvider } from "contexts/modalContext";
+import Navbar from "pages/layout/navbar";
+import { AuthProvider } from "contexts/authContext";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   <BrowserRouter>
-    <ModalProvider>
-      <App />
-      <ToastContainer />
-    </ModalProvider>
+    <AuthProvider>
+      <ModalProvider>
+        <Navbar />
+        <App />
+        <ToastContainer />
+      </ModalProvider>
+    </AuthProvider>
   </BrowserRouter>
 );

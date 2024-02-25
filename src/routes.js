@@ -1,5 +1,7 @@
 import Home from "pages/home";
 import Login from "./pages/login";
+import Articles from "pages/articles";
+import Register from "pages/register";
 const routes = [
   {
     path: "/",
@@ -7,9 +9,19 @@ const routes = [
     element: <Home />,
   },
   {
+    path: "/articles",
+    name: "articles",
+    element: <Articles />,
+  },
+  {
     path: "login",
     name: "login",
     element: <Login />,
+  },
+  {
+    path: "register",
+    name: "register",
+    element: <Register />,
   },
 ];
 

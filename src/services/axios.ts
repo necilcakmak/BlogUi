@@ -15,6 +15,7 @@ const axiosClient = (): AxiosInstance => {
     (config: any) => {
       const token = localStorage.getItem("token");
       if (token) {
+
         config.headers.Authorization = `${token}`;
       }
       return config;

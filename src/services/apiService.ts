@@ -1,6 +1,6 @@
-import  { AxiosResponse } from 'axios';
-import { Result } from 'interfaces/result';
-import axiosClient from './axios';
+import { AxiosResponse } from "axios";
+import { Result } from "interfaces/result";
+import axiosClient from "./axios";
 
 const client = axiosClient();
 
@@ -13,13 +13,25 @@ class ApiService {
       throw new Error(`API request failed: ${error}`);
     }
   }
-
-  static async post<T>(url: string, payload: any): Promise<Result<T>> {
+  static async delete<T>(url: string, id: any): Promise<Result<T>> {
     try {
-      const response: AxiosResponse<Result<T>> = await client.post(`${url}`, payload);
+      const response: AxiosResponse<Result<T>> = await client.delete(
+        `${url}/${id}`
+      );
       return response.data;
     } catch (error) {
-       debugger
+      throw new Error(`API request failed: ${error}`);
+    }
+  }
+  static async post<T>(url: string, payload: any): Promise<Result<T>> {
+    try {
+      const response: AxiosResponse<Result<T>> = await client.post(
+        `${url}`,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      debugger;
       throw new Error(`API request failed: ${error}`);
     }
   }

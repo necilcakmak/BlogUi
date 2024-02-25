@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AccessToken } from "interfaces/accessToken";
 import { toast } from "react-toastify";
 import ApiService from "services/apiService";
-import { useModal } from "contexts/modalContext";
+import { useAuth } from "contexts/authContext";
 
 interface LoginError {
   email?: string;
@@ -16,7 +16,7 @@ interface LoginError {
 }
 const Login = () => {
   const { t } = useTranslation();
-  const { showModal } = useModal();
+  const { login } = useAuth();
   const [errors, setErrors] = useState<LoginError>({});
   const navigate = useNavigate();
   const [pendingApiCall, setPendingApiCall] = useState(false);
@@ -38,24 +38,22 @@ const Login = () => {
     }));
   };
 
-  const handleShowModal = (e: React.MouseEvent<HTMLButtonElement>) => {
-    showModal("Devam etmek istiyor musunuz?", () => {
-      onSubmit(e);
-    });
-  };
   const onSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const cred = {
       email,
       password,
     };
+    setPendingApiCall(true);
     const response = await ApiService.post<AccessToken>(
       endPoints.LOGIN_URL,
       cred
     );
+
     if (response.success === true) {
-      localStorage.setItem("token", JSON.stringify(response.data?.token));
+      localStorage.setItem("token", response.data.token || "");
       localStorage.setItem("user", JSON.stringify(response.data?.user));
+      login(response.data.user);
       toast.success(response.message);
       navigate("/");
     } else {
@@ -64,6 +62,7 @@ const Login = () => {
       }
       toast.error(response.message);
     }
+    setPendingApiCall(false);
   };
   return (
     <div className="container mt-5">
@@ -97,15 +96,13 @@ const Login = () => {
             <Button
               cls="btn btn-primary"
               type="submit"
-              pendingApiCall={pendingApiCall}
+              disabled={pendingApiCall}
               text={t("Login")}
-              onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-                handleShowModal(e)
-              }
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => onSubmit(e)}
             />
             <div style={{ float: "right" }}>
-              <Link className="btn btn-primary" to="/">
-                {t("Home")}
+              <Link className="btn btn-primary" to="/register">
+                {t("Register")}
               </Link>
             </div>
           </div>
