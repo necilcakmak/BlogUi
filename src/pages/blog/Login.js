@@ -5,12 +5,12 @@ import { useAuth } from "context";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import Button from "components/Button";
-import { AuthService } from "services/AuthService";
 import Input from "components/Input";
 import { object, string } from "yup";
+import endPoints from "../../EndPoints";
+import { httpService } from "../../tools/httpService";
 
 const Login = () => {
-  const authService = new AuthService();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { setIsLoggedIn, setUser } = useAuth();
@@ -61,7 +61,7 @@ const Login = () => {
       password,
     };
     setPendingApiCall(true);
-    const response = await authService.login(cred);
+    const response = await httpService.post(endPoints.LOGIN_URL, cred);
     setPendingApiCall(false);
     if (response.success === true) {
       localStorage.setItem("token", response.data.token);

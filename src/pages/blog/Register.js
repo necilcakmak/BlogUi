@@ -5,12 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Button from "../../components/Button";
 import { Link } from "react-router-dom";
-import { AuthService } from "../../services/AuthService";
 import { Calendar } from "primereact/calendar";
 import { object, string } from "yup";
+import endPoints from "../../EndPoints";
+import { httpService } from "../../tools/httpService";
 
 const Register = () => {
-  const authService = new AuthService();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
@@ -76,7 +76,7 @@ const Register = () => {
       return;
     }
     setPendingApiCall(true);
-    const response = await authService.register(form);
+    const response = await httpService.post(endPoints.REGISTER_URL, form);
 
     setPendingApiCall(false);
     if (response.success === true) {

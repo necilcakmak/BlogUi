@@ -1,8 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import endPoints from "../../EndPoints";
+import { httpService } from "tools/httpService";
 
 const AdminHome = () => {
   const { t } = useTranslation();
+  const [users, setUsers] = useState({});
+  const [articles, setArticles] = useState({});
+  const [comments, setComments] = useState({});
+  useEffect(() => {
+    getUsers();
+    getArticles();
+    getComments();
+  }, []);
+  const getArticles = async () => {
+    const response = await httpService.get(endPoints.GET_ARTICLES);
+    if (response.success) {
+      setArticles(response.data);
+    }
+  };
+  const getComments = async () => {
+    const response = await httpService.get(endPoints.GET_COMMENTS);
+    if (response.success) {
+      setComments(response.data);
+    }
+  };
+  const getUsers = async () => {
+    const response = await httpService.get(endPoints.GET_USERS);
+    if (response.success) {
+      setUsers(response.data);
+    }
+  };
   return (
     <div className="grid">
       <div className="col-4 lg:col-6 xl:col-3">
@@ -10,7 +38,9 @@ const AdminHome = () => {
           <div className="flex justify-content-between mb-3">
             <div>
               <span className="block text-500 font-medium mb-3">Articles</span>
-              <div className="text-900 font-medium text-xl">152</div>
+              <div className="text-900 font-medium text-xl">
+                {articles.lenght}
+              </div>
             </div>
             <div
               className="flex align-items-center justify-content-center bg-blue-100 border-round"
@@ -23,13 +53,13 @@ const AdminHome = () => {
           <span className="text-500">since last visit</span>
         </div>
       </div>
-   
+
       <div className="col-4 lg:col-6 xl:col-3">
         <div className="card mb-0">
           <div className="flex justify-content-between mb-3">
             <div>
               <span className="block text-500 font-medium mb-3">Users</span>
-              <div className="text-900 font-medium text-xl">28441</div>
+              <div className="text-900 font-medium text-xl">{users.length}</div>
             </div>
             <div
               className="flex align-items-center justify-content-center bg-cyan-100 border-round"
@@ -47,7 +77,9 @@ const AdminHome = () => {
           <div className="flex justify-content-between mb-3">
             <div>
               <span className="block text-500 font-medium mb-3">Comments</span>
-              <div className="text-900 font-medium text-xl">152 Unread</div>
+              <div className="text-900 font-medium text-xl">
+                {comments.lenght}
+              </div>
             </div>
             <div
               className="flex align-items-center justify-content-center bg-purple-100 border-round"

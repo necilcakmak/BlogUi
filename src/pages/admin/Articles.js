@@ -14,11 +14,14 @@ import { Button } from "primereact/button";
 import { classNames } from "primereact/utils";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ArticleService } from "../../services/ArticleService";
+import { object, string } from "yup";
+import SelectInput from "components/SelectInput";
 
 const Articles = () => {
   const articleService = new ArticleService();
   const [articles, setArticles] = useState(null);
   const [article, setArticle] = useState(null);
+  const [categories, setCategories] = useState(null);
   const [filters, setFilters] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -28,16 +31,43 @@ const Articles = () => {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    const articles = async () => {
-      const response = await articleService.getArticleList();
-      if (response.success) {
-        setArticles(response.data);
-        setLoading(false);
-      }
-    };
     initFilters();
-    articles();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    getArticles();
+  }, []);
+  const getArticles = async () => {
+    const response = await articleService.getArticleList();
+    if (response.success) {
+      setArticles(response.data);
+      setLoading(false);
+    }
+  };
+  const getCategories = async () => {
+    const response = await httpService.get(endPoints.GET_CATEGORİES);
+    if (response.success) {
+      setCategories(response.data);
+      setLoading(false);
+    }
+  };
+  let validationSchema = object({
+    categoryId:string().required("Lütfen seçim yapınız"),
+    title: string()
+      .required("Bu alan zorunludur!")
+      .min(5, "En az 5 karakter olmalı")
+      .max(50, "En fazla 50 karakter olabilir"),
+    content: string()
+      .required("Bu alan zorunludur!")
+      .min(5, "En az 5 karakter olmalı")
+      .max(5000, "En fazla 50 karakter olabilir"),
+    slug: string()
+      .required("Bu alan zorunludur!")
+      .min(5, "En az 5 karakter olmalı")
+      .max(150, "En fazla 50 karakter olabilir"),
+    keywords: string()
+      .required("Bu alan zorunludur!")
+      .min(5, "En az 5 karakter olmalı")
+      .max(250, "En fazla 50 karakter olabilir"),
+  });
+
   const initFilters = () => {
     setFilters({
       title: {
@@ -91,17 +121,21 @@ const Articles = () => {
     }
   };
   const deleteSelectedArticles = async () => {
-    let idList = selectedData.map((v) => v.id);
-    const response = await articleService.deleteArticlesByIdList(idList);
-    if (response.success) {
-      let items = articles.filter((val) => !selectedData.includes(val));
-      setArticles(items);
-      setDeleteDialog(false);
-      setSelectedData(null);
-      toast.success(response.message);
+    if (!selectedData) {
+      deleteArticle();
     } else {
-      setDeleteDialog(false);
-      toast.error(response.message);
+      let idList = selectedData.map((v) => v.id);
+      const response = await articleService.deleteArticlesByIdList(idList);
+      if (response.success) {
+        let items = articles.filter((val) => !selectedData.includes(val));
+        setArticles(items);
+        setDeleteDialog(false);
+        setSelectedData(null);
+        toast.success(response.message);
+      } else {
+        setDeleteDialog(false);
+        toast.error(response.message);
+      }
     }
   };
   const hideDeleteDialog = () => {
@@ -127,6 +161,7 @@ const Articles = () => {
     setNewDialog(false);
   };
   const openNew = () => {
+    getCategories();
     setArticle(null);
     setSubmitted(false);
     setNewDialog(true);
@@ -135,6 +170,17 @@ const Articles = () => {
     e.preventDefault();
     setSubmitted(true);
     let postItem = { ...article };
+    try {
+      await validationSchema.validate(postItem, { abortEarly: false });
+    } catch (error) {
+      let newErrors = {};
+      error.inner.forEach((err) => {
+        newErrors[err.path] = err.message;
+      });
+      setErrors(newErrors);
+      toast.error("Bilgileri kontrol ediniz.");
+      return;
+    }
     const response = await httpService.post(endPoints.ADD_ARTICLE, postItem);
     if (response.success) {
       articles.push(response.data);
@@ -142,7 +188,6 @@ const Articles = () => {
       setArticle(null);
       toast.success(response.message);
     } else {
-      debugger;
       setErrors(response.validationErrors);
       toast.error(response.message);
     }
@@ -163,22 +208,7 @@ const Articles = () => {
       />
     </>
   );
-  const deletesDialogFooter = (
-    <>
-      <Button
-        label="No"
-        icon="pi pi-times"
-        className="p-button-text"
-        onClick={hideDeleteDialog}
-      />
-      <Button
-        label="Yes"
-        icon="pi pi-check"
-        className="p-button-text"
-        onClick={deleteSelectedArticles}
-      />
-    </>
-  );
+ 
   const header = (
     <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
       <h5 className="m-0">Manage Articles</h5>
@@ -296,6 +326,17 @@ const Articles = () => {
             onHide={hideDialog}
           >
             <div className="field">
+              <SelectInput
+                label="categories"
+                name="categoryId"
+                error={errors.categoryId}
+                value={article?.categoryId}
+           
+                options={categories}
+                onChange={(e) => onInputChange(e, "categoryId")}
+              />
+            </div>
+            <div className="field">
               <label htmlFor="title">Title</label>
               <InputText
                 id="title"
@@ -304,14 +345,12 @@ const Articles = () => {
                 required
                 autoFocus
                 className={classNames({
-                  "p-invalid": (submitted && !article?.title) || errors.title,
+                  "form-control is-invalid":
+                    (submitted && !article?.title) || errors.title,
                 })}
               />
-              {submitted && !article?.title && (
-                <small className="p-invalid">Title is required.</small>
-              )}
               {submitted && errors.title && (
-                <small className="p-invalid">{errors.title}</small>
+                <small className="invalid-feedback">{errors.title}</small>
               )}
             </div>
             <div className="field">
@@ -324,15 +363,48 @@ const Articles = () => {
                 rows={3}
                 cols={20}
                 className={classNames({
-                  "p-invalid":
+                  "form-control is-invalid":
                     (submitted && !article?.content) || errors.content,
                 })}
               />
-              {submitted && !article?.content && (
-                <small className="p-invalid">Content is required.</small>
-              )}
               {submitted && errors.content && (
-                <small className="p-invalid">{errors.content}</small>
+                <small className="invalid-feedback">{errors.content}</small>
+              )}
+            </div>
+            <div className="field">
+              <label htmlFor="slug">Slug</label>
+              <InputTextarea
+                id="slug"
+                value={article?.slug}
+                onChange={(e) => onInputChange(e, "slug")}
+                required
+                rows={3}
+                cols={20}
+                className={classNames({
+                  "form-control is-invalid":
+                    (submitted && !article?.slug) || errors.slug,
+                })}
+              />
+              {submitted && errors.slug && (
+                <small className="invalid-feedback">{errors.slug}</small>
+              )}
+            </div>
+            <div className="field">
+              <label htmlFor="keywords">Keywords</label>
+              <InputTextarea
+                id="keywords"
+                value={article?.keywords}
+                onChange={(e) => onInputChange(e, "keywords")}
+                required
+                rows={3}
+                cols={20}
+                className={classNames({
+                  "form-control is-invalid":
+                    (submitted && !article?.keywords) || errors.keywords,
+                })}
+              />
+              {submitted && errors.content && (
+                <small className="invalid-feedback">{errors.keywords}</small>
               )}
             </div>
           </Dialog>
@@ -357,7 +429,7 @@ const Articles = () => {
             style={{ width: "450px" }}
             header="Confirm"
             modal
-            footer={deletesDialogFooter}
+            footer={deleteDialogFooter}
             onHide={hideDeleteDialog}
           >
             <div className="flex align-items-center justify-content-center">

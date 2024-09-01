@@ -1,4 +1,4 @@
-import axios, { HttpStatusCode } from "axios";
+import axios, { AxiosError, HttpStatusCode } from "axios";
 import { toast } from "react-toastify";
 export const httpService = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
@@ -30,8 +30,10 @@ httpService.interceptors.response.use(
     if (err.response?.data?.success === false) {
       return err.response.data;
     }
+    if (err.code == AxiosError.ERR_NETWORK) {
+      toast.error("Sunucuya ulaşılamadı");
+    }
 
-    toast.error(err.message);
     return Promise.reject(err);
   }
 );

@@ -1,6 +1,6 @@
 import React from "react";
 const SelectInput = (props) => {
-  const { label, name, onChange, defaultOption, value, error, options } = props;
+  const { label, name, onChange, value, error, options } = props;
   const className = error ? "form-control is-invalid " : "form-control";
   return (
     <div className="form-group">
@@ -11,11 +11,11 @@ const SelectInput = (props) => {
         onChange={onChange}
         className={className}
       >
-        <option value="">{defaultOption}</option>
-        {options.map((option) => {
+        <option value="">Seçiniz</option>
+        {options?.map((option) => {
           return (
-            <option key={option.value} value={option.value}>
-              {option.text}
+            <option key={option.id} value={option.id}>
+              {option.name}
             </option>
           );
         })}
