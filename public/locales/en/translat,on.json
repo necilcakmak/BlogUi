@@ -1,0 +1,26 @@
+{
+  "Common": {
+    "add": "Add",
+    "delete": "Delete",
+    "update": "Update",
+    "detail": "Detail"
+  },
+  "Yes": "Yes",
+  "No": "No",
+  "Detail": "Detail",
+  "LoginPage": "Login Page",
+  "Email": "E-Mail",
+  "Password": "Password",
+  "Login": "Login",
+  "Register": "Register",
+  "Home": "Home",
+  "Articles": "Articles",
+  "Logout": "Logout",
+  "Add": "Add",
+  "Admin": "Admin",
+  "User": "User",
+  "Users": "Users",
+  "Profile": "Profile",
+  "Author": "Author",
+  "Category": "Category"
+}

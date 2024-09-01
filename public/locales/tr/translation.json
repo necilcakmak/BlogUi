@@ -1,0 +1,26 @@
+{
+  "Common": {
+    "add": "Ekle",
+    "delete": "Sil",
+    "update": "Güncelle",
+    "detail": "Detay"
+  },
+  "Yes": "Evet",
+  "No": "Hayır",
+  "Detail": "Detay",
+  "LoginPage": "Giriş Sayfası",
+  "Email": "E-Posta",
+  "Password": "Parola",
+  "Login": "Giriş",
+  "Register": "Kayıt Ol",
+  "Home": "AnaSayfa",
+  "Articles": "Makaleler",
+  "Logout": "Çıkış",
+  "Add": "Ekle",
+  "Admin": "Yönetici",
+  "User": "Kullanıcı",
+  "Users": "Kullanıcılar",
+  "Profile": "Profil",
+  "Author": "Yazar",
+  "Category": "Kategori"
+}
